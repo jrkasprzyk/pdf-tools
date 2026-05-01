@@ -5,6 +5,7 @@ import { EnhancedWord, Rect, Word, Image, Font } from "./pdf2md.model";
 import { OPS, PDFPageProxy, Util } from 'pdfjs-dist/legacy/build/pdf.js'
 // doesn't work with parcel
 import { getLinks, matchLink } from "./pdf2md.link";
+import { normalizeLigatures } from "./pdf2md.normalize";
 import type { TextItem } from "pdfjs-dist/types/src/display/api";
 /**
  * Represents a transformation matrix used for scaling and translating 2D points.
@@ -383,8 +384,9 @@ export async function processPage(page: PDFPageProxy) {
         globals.addTextHeight(textRect.height)
 
         const link = links.find( lnk => matchLink(textRect,lnk) )
-        
-        const text = ( link && link.url ) ? `[${item.str}](${link.url})` : item.str
+
+        const normalized = normalizeLigatures(item.str)
+        const text = ( link && link.url ) ? `[${normalized}](${link.url})` : normalized
 
         return { text: text, font: item.fontName, ...textRect }
 
