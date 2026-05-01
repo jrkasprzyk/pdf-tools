@@ -1,4 +1,4 @@
-import { createCanvas } from "canvas"
+import { createCanvas } from "@napi-rs/canvas"
 import { assert } from "console"
 import fs from "fs"
 import path from 'path'
@@ -120,7 +120,7 @@ export async function writePageImageOrReuseOneFromCache(img: PDFImage, name: Ima
 interface CanvasObject {
   width: number
   height: number
-  toBuffer(): Buffer
+  toBuffer(mimeType?: string): Buffer
 }
 /**
  * @typedef {any} CanvasContext2D
@@ -191,7 +191,7 @@ export async function writePageAsImage(page: PDFPageProxy) {
 
   await page.render(renderContext).promise;
 
-  const content = canvasAndContext.canvas.toBuffer();
+  const content = canvasAndContext.canvas.toBuffer('image/png');
 
 
   //console.dir( page )
