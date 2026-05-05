@@ -3,9 +3,9 @@ import { assert } from "console"
 import fs from "fs"
 import path from 'path'
 import { promisify } from 'util'
-import Jimp from 'jimp'
+import { Jimp, type JimpInstance, diff } from 'jimp'
 import { globals } from "./pdf2md.global"
-import { PDFPageProxy } from 'pdfjs-dist/legacy/build/pdf.js'
+import type { PDFPageProxy } from 'pdfjs-dist'
 enum PDFImageKind {
   GRAYSCALE_1BPP = 1,
   RGB_24BPP = 2,
@@ -28,7 +28,7 @@ type ImageName = string
  * @property {ImageName} name - The name of the image.
  */
 type ImageData = {
-  jimg: Jimp,
+  jimg: JimpInstance,
   name: ImageName
 }
 const imagesCache = new Map<ImageHash, Array<ImageData>>();
@@ -60,36 +60,29 @@ export async function writePageImageOrReuseOneFromCache(img: PDFImage, name: Ima
 
   }
 
-  const jimg = new Jimp(img.width, img.height)
-
-  const byteWidth = (img.width * bytesPerPixel)
-
-  for (var x = 0; x < img.width; x++) {
-    for (var y = 0; y < img.height; y++) {
-
-      const index = (y * byteWidth) + (x * bytesPerPixel);
-      const r = img.data[index];
-      const g = img.data[index + 1];
-      const b = img.data[index + 2];
-      const a = bytesPerPixel == 3 ? 255 : img.data[index + 3]
-
-      //const num = (r*256) + (g*256*256) + (b*256*256*256) + a;
-
-      const num = Jimp.rgbaToInt(r, g, b, a)
-      jimg.setPixelColor(num, x, y);
-
+  const byteWidth = img.width * bytesPerPixel;
+  const rawData = Buffer.alloc(img.width * img.height * 4);
+  for (let x = 0; x < img.width; x++) {
+    for (let y = 0; y < img.height; y++) {
+      const srcIdx = (y * byteWidth) + (x * bytesPerPixel);
+      const dstIdx = (y * img.width + x) * 4;
+      rawData[dstIdx]     = img.data[srcIdx];
+      rawData[dstIdx + 1] = img.data[srcIdx + 1];
+      rawData[dstIdx + 2] = img.data[srcIdx + 2];
+      rawData[dstIdx + 3] = bytesPerPixel === 3 ? 255 : img.data[srcIdx + 3];
     }
   }
+  const jimg = Jimp.fromBitmap({ width: img.width, height: img.height, data: rawData }) as JimpInstance;
 
   let result
 
   if (globals.useImageDuplicateDetection) {
 
-    const imageHash = jimg.hash();
+    const imageHash = (Jimp as any).hash(jimg) as string;
     const cachedItem = imagesCache.get(imageHash);
 
     if (cachedItem) {
-      const equals = cachedItem.find(item => Jimp.diff(jimg, item.jimg).percent == 0)
+      const equals = cachedItem.find(item => diff(jimg, item.jimg).percent === 0)
       if (equals) {
         result = equals.name
       }
@@ -104,7 +97,7 @@ export async function writePageImageOrReuseOneFromCache(img: PDFImage, name: Ima
   }
 
   if (!result) {
-    jimg.write(path.join(globals.outDir, `${name}.png`))
+    await jimg.write(path.join(globals.outDir, `${name}.png`) as `${string}.png`)
     return name
   }
 
@@ -173,27 +166,16 @@ class NodeCanvasFactory {
  * @param {PDFPageProxy} page - The page to render.
  */
 export async function writePageAsImage(page: PDFPageProxy) {
-  // Render the page on a Node canvas with 100% scale.
   const viewport = page.getViewport({ scale: 1.0 });
-
-  const canvasFactory = new NodeCanvasFactory();
-
-  const canvasAndContext = canvasFactory.create(
-    viewport.width,
-    viewport.height
-  );
+  const canvas = createCanvas(viewport.width, viewport.height);
 
   const renderContext = {
-    canvasContext: canvasAndContext.context,
+    canvas: canvas as unknown as HTMLCanvasElement,
     viewport: viewport,
-    canvasFactory: canvasFactory,
   };
 
   await page.render(renderContext).promise;
 
-  const content = canvasAndContext.canvas.toBuffer('image/png');
-
-
-  //console.dir( page )
+  const content = canvas.toBuffer('image/png');
   await writeFileAsync(path.join(globals.outDir, `page-${page.pageNumber}.png`), content)
 }

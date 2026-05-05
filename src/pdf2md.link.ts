@@ -1,4 +1,4 @@
-import { PDFPageProxy } from 'pdfjs-dist/legacy/build/pdf.js'
+import type { PDFPageProxy } from 'pdfjs-dist'
 import { Rect } from "./pdf2md.model"
 /**
  * Determines if a given rectangle `rect` is within the bounds of a PDF `link`.

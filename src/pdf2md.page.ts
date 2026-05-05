@@ -2,7 +2,8 @@ import assert from "assert";
 import { globals } from "./pdf2md.global";
 import { writePageImageOrReuseOneFromCache } from "./pdf2md.image";
 import { EnhancedWord, Rect, Word, Image, Font } from "./pdf2md.model";
-import { OPS, PDFPageProxy, Util } from 'pdfjs-dist/legacy/build/pdf.js'
+import { OPS, Util } from 'pdfjs-dist'
+import type { PDFPageProxy } from 'pdfjs-dist'
 // doesn't work with parcel
 import { getLinks, matchLink } from "./pdf2md.link";
 import { normalizeLigatures } from "./pdf2md.normalize";
@@ -262,7 +263,7 @@ export async function processPage(page: PDFPageProxy) {
 
     const images = Array<Image>()
 
-    ops.fnArray.forEach(async (fn, j) => {
+    ops.fnArray.forEach(async (fn: number, j: number) => {
 
         // const s = Object.entries(OPS).find( ([_,v]) => v === fn )
         // if( s ) console.log( `Operation: ${fn}: ${s[0]} at ${j}` )
@@ -297,7 +298,7 @@ export async function processPage(page: PDFPageProxy) {
                 //console.log( imageMatrix )  
 
                 break;
-            case OPS.paintJpegXObject:
+            case OPS.paintXObject:
             case OPS.paintImageXObject:
 
                 const position = { x: 0, y: 0 }
@@ -333,12 +334,6 @@ export async function processPage(page: PDFPageProxy) {
                 }
 
                 imageMatrix = null
-                break
-            case OPS.beginAnnotations:
-                // console.trace( 'beginAnnotations', args )
-                break
-            case OPS.endAnnotations:    
-                // console.log( 'endAnnotations', args )
                 break
             case OPS.beginAnnotation:
                 // console.log( 'beginAnnotation', args )

@@ -6,7 +6,7 @@ import { globals } from './pdf2md.global';
 import { Command } from 'commander'
 import { assert } from 'console';
 import { pdfToMarkdown } from './pdf2md.main';
-import { getDocument, OPS } from 'pdfjs-dist/legacy/build/pdf.js'
+import { getDocument, OPS } from 'pdfjs-dist'
 // Some PDFs need external cmaps.
 const CMAP_URL = "../../../node_modules/pdfjs-dist/cmaps/";
 const CMAP_PACKED = true;
@@ -72,7 +72,7 @@ async function extractImagesfromPages(pdfPath: string) {
 
       for (let j = 0; j < ops.fnArray.length; j++) {
 
-        if (ops.fnArray[j] == OPS.paintJpegXObject || ops.fnArray[j] == OPS.paintImageXObject) {
+        if (ops.fnArray[j] == OPS.paintXObject || ops.fnArray[j] == OPS.paintImageXObject) {
 
           const op = ops.argsArray[j][0];
           
