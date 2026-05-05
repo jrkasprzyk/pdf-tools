@@ -20,7 +20,7 @@ npm install @bsorrentino/pdf-tools -g
 ## Requirements
 
 * NodeJs >= 16
-* Since **pdf-tools** use [`canvas`] that is a [`Cairo`]-backed Canvas implementation for Node.js take a look to its [reqirements]
+* Since **pdf-tools** uses [`@napi-rs/canvas`] (prebuilt NAPI binaries, no native compilation required), no additional system dependencies are needed
 
 
 ## pdftools Commands 
@@ -75,6 +75,7 @@ pdftools pdf2md|p2md [options] <pdf>
 * Extract plain text 
 * Extract fonts and allow custom mapping through a generated file `<document name>.font.json`
   > Supported fonts **bold**, _italic_, `monospace`, **_bold+italic_**
+* Normalize font ligatures (fi, fl, ff, ffi, ffl) and strip Private Use Area (PUA) codepoints from extracted text
 * Detect code block ( i.e. ` ``` `)
 * Detect external link
 
@@ -82,6 +83,4 @@ pdftools pdf2md|p2md [options] <pdf>
 
 * Detect TOC
 
-[`canvas`]: https://www.npmjs.com/package/canvas
-[`Cairo`]: http://cairographics.org/
-[reqirements]: https://github.com/Automattic/node-canvas#compiling
+[`@napi-rs/canvas`]: https://www.npmjs.com/package/@napi-rs/canvas
