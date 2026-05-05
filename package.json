@@ -21,8 +21,8 @@
     "@napi-rs/canvas": "^0.1.100",
     "commander": "^12.1.0",
     "enumify": "^2.0.0",
-    "jimp": "^0.22.12",
-    "pdfjs-dist": "^2.16.105"
+    "jimp": "^1.6.1",
+    "pdfjs-dist": "^5.7.284"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
