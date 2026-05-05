@@ -2,8 +2,8 @@ import assert from "assert";
 import { globals } from "./pdf2md.global";
 import { writePageImageOrReuseOneFromCache } from "./pdf2md.image";
 import { EnhancedWord, Rect, Word, Image, Font } from "./pdf2md.model";
-import { OPS, Util } from 'pdfjs-dist'
-import type { PDFPageProxy } from 'pdfjs-dist'
+import { OPS, Util } from './pdfjs-node'
+import type { PDFPageProxy } from './pdfjs-node'
 // doesn't work with parcel
 import { getLinks, matchLink } from "./pdf2md.link";
 import { normalizeLigatures } from "./pdf2md.normalize";
