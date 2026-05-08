@@ -213,13 +213,21 @@ class Globals {
         this.outDir = path.join(process.cwd(), 'out')
     }
 
+    reset() {
+        this._fontMap.clear()
+        this._textHeights.clear()
+        this._stats = null
+        this._options = { filler: false, debug: false, stats: false }
+        this.pageSeparator = undefined
+    }
+
     consoleLog() {
 
 
         const log = [ { ...this.stats, textHeigths: JSON.stringify( this.stats.textHeigths) } ]
 
         console.table( log )
-        
+
     }
 }
 export const globals = new Globals()

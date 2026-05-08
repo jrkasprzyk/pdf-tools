@@ -65,7 +65,7 @@ export async function pdfToMarkdown(pdfPath: string) {
 
     await writeFile( outFile, content )
 
-    globals.saveFonts( fontFile )
+    await globals.saveFonts( fontFile )
 
     if( globals.options.debug ) {
       pages.forEach( p => p.consoleLog() )

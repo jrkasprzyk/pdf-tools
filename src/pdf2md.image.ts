@@ -32,6 +32,8 @@ type ImageData = {
   name: ImageName
 }
 const imagesCache = new Map<ImageHash, Array<ImageData>>();
+
+export function clearImageCache() { imagesCache.clear() }
 /**
  * Writes a PDF image to a file or reuses an existing image from the cache.
  *
@@ -78,7 +80,7 @@ export async function writePageImageOrReuseOneFromCache(img: PDFImage, name: Ima
 
   if (globals.useImageDuplicateDetection) {
 
-    const imageHash = (Jimp as any).hash(jimg) as string;
+    const imageHash = jimg.hash();
     const cachedItem = imagesCache.get(imageHash);
 
     if (cachedItem) {
